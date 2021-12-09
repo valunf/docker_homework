@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+      - database
+    stdin_open: true
+    ports:
+      - 3000:3000
+    networks:
+      - default
+
+  backend:
+    build: ./backend
+    depends_on:
+      - database
+    ports:
+      - 8000:8000
+    networks:
+      - default
+
+  database:
+    build: ./database
+    expose:
+      - 5432
+    healthcheck:
+      test: pg_isready
+    networks:
+      - default
+    volumes:
+      - labpostgres:/var/lib/postgresql/data
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.11.0/24
+
+volumes:
+  labpostgres: {}
